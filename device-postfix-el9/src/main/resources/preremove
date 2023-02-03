@@ -1,0 +1,7 @@
+if [ $1 = 0 ]; then
+  /usr/bin/systemctl stop postfix-autodiscovery.service
+  /usr/bin/systemctl stop postfix.service
+  /usr/bin/systemctl disable postfix-autodiscovery.service
+  /usr/bin/systemctl disable postfix.service
+fi
+

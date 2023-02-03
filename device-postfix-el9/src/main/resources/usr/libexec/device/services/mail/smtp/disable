@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+umask 0002
+
+if [ "$1" == "--" ]; then
+
+  /usr/bin/sudo /usr/bin/systemctl --quiet disable postfix-autodiscovery.service
+  /usr/bin/sudo /usr/bin/systemctl --quiet disable postfix.service
+
+  if test -f "disabled"; then
+    echo "smtp is already disabled."
+  elif test -f "enabled"; then
+    mv "enabled" "disabled"
+    /usr/bin/sudo /usr/bin/systemctl stop postfix.service
+    /usr/bin/sudo /usr/bin/systemctl stop postfix-autodiscovery.service
+  fi
+
+fi
+
