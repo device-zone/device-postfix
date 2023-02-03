@@ -1,0 +1,88 @@
+#!/bin/bash
+
+#
+# Postfix Autodiscovery - TLS
+# ===========================
+# 
+# This script autogenerates the inbound TLS configuration for a postfix server.
+
+set -e
+umask 0022
+
+myhostname=$(cat /etc/hostname)
+
+
+
+#
+# Generate Config
+# ---------------
+#
+
+if [ -f "/etc/device/services/mail/smtp/tls/tls-dns.txt" ]; then
+
+  tls_dns=$(head -n 1 /etc/device/services/mail/smtp/tls/tls-dns.txt)
+
+  logger -t postfix-autodiscovery "importing postfix server certificate/key..."
+
+  install -m 0750 -d /run/postfix-tls /run/postfix-tls/ca-certs /run/postfix-tls/certs /run/postfix-tls/private
+
+  redwax-tool --pem-in="/etc/pki/tls/private/*" \
+              --pem-in="/etc/pki/tls/certs/ca-bundle.trust.crt" \
+              --pem-in="/etc/pki/tls/certs/*.pem" \
+              --filter=verify \
+              --filter-hostname="${tls_dns}" \
+              --filter-current \
+              --cert-out --chain-out --no-key-out \
+              --pem-out="/run/postfix-tls/certs/snmpd.crt" \
+              --no-cert-out --no-chain-out --trust-out \
+              --pem-out="/run/postfix-tls/ca-certs/ssl-cacert.pem" \
+              --no-chain-out --no-trust-out --key-out \
+              --pem-out="/run/postfix-tls/private/snmpd.key" || echo "Could not import cert/key for tls" > "error"
+
+  if test ! -f "error"; then
+    logger -t postfix-autodiscovery "imported postfix server certificate/key."
+  else
+    logger -t postfix-autodiscovery "failed to import postfix server certificate/key."
+  fi
+
+  smtpd_tls_cert_file="/run/postfix-tls/certs/snmpd.crt"
+  smtpd_tls_key_file="/run/postfix-tls/private/snmpd.key"
+  smtpd_tls_security_level="may"
+
+  cat >> "main.cf" <<- EOF
+# Note: certificate from /etc/device/services/mail/smtp/tls/tls-dns.txt
+
+# INBOUND TLS CONFIGURATION
+#
+# The following certificates are used for inbound connections.
+
+# The full pathname of a file with the Postfix SMTP server RSA certificate
+# in PEM format. Intermediate certificates should be included in general,
+# the server certificate first, then the issuing CA(s) (bottom-up order).
+#
+smtpd_tls_cert_file = ${smtpd_tls_cert_file}
+
+# The full pathname of a file with the Postfix SMTP server RSA private key
+# in PEM format. The private key must be accessible without a pass-phrase,
+# i.e. it must not be encrypted.
+#
+smtpd_tls_key_file = ${smtpd_tls_key_file}
+
+# Announce STARTTLS support to remote SMTP clients, but do not require that
+# clients use TLS encryption (opportunistic TLS inbound).
+#
+smtpd_tls_security_level = ${smtpd_tls_security_level}
+
+# Bind to all interfaces so that we are publicly accessible. Overrides config
+# above.
+inet_interfaces = all
+
+EOF
+
+  if command -v /usr/bin/firewall-cmd 2>/dev/null; then
+    logger -t postfix-autodiscovery "Notice: enabling firewall for smtp..."
+    /usr/bin/firewall-cmd --quiet --zone=public --add-service=smtp 2> /dev/null || true
+  fi
+
+fi
+

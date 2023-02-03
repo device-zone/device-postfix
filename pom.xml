@@ -27,6 +27,7 @@
 
   <modules>
     <module>device-postfix-el9</module>
+    <module>device-postfix-tls-el9</module>
   </modules>
 
   <build>
