@@ -138,7 +138,31 @@
                   <location>target/classes/usr/libexec/device-postfix-autodiscovery-master</location>
                   <destination>10-master</destination>
                 </source>
+                <source>
+                  <location>target/classes/usr/libexec/device-postfix-autodiscovery-limit</location>
+                  <destination>20-limit</destination>
+                </source>
               </sources>
+            </mapping>
+            <mapping>
+              <directory>/usr/libexec</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/libexec/device-postfix-postdiscovery</location>
+                  <destination>device-postfix-postdiscovery</destination>
+                </source>
+              </sources>
+            </mapping>
+            <mapping>
+              <directory>/usr/libexec/device-postfix-postdiscovery.d</directory>
+              <directoryIncluded>true</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
             </mapping>
             <mapping>
               <directory>/usr/lib/systemd/system</directory>
@@ -150,6 +174,19 @@
                 <source>
                   <location>target/classes/usr/lib/systemd/system/postfix-autodiscovery.service</location>
                   <destination>postfix-autodiscovery.service</destination>
+                </source>
+              </sources>
+            </mapping>
+            <mapping>
+              <directory>/usr/lib/systemd/system</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>644</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/lib/systemd/system/postfix-postdiscovery.service</location>
+                  <destination>postfix-postdiscovery.service</destination>
                 </source>
               </sources>
             </mapping>

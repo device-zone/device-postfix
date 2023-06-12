@@ -9,22 +9,19 @@
 set -e
 umask 0022
 
-myhostname=$(cat /etc/hostname)
-
-
 
 #
 # Generate Config
 # ---------------
 #
 
+install -m 0750 -d /run/postfix-tls /run/postfix-tls/ca-certs /run/postfix-tls/certs /run/postfix-tls/private
+
 if [ -f "/etc/device/services/mail/smtp/tls/tls-dns.txt" ]; then
 
   tls_dns=$(head -n 1 /etc/device/services/mail/smtp/tls/tls-dns.txt)
 
   logger -t postfix-autodiscovery "importing postfix server certificate/key..."
-
-  install -m 0750 -d /run/postfix-tls /run/postfix-tls/ca-certs /run/postfix-tls/certs /run/postfix-tls/private
 
   redwax-tool --pem-in="/etc/pki/tls/private/*" \
               --pem-in="/etc/pki/tls/certs/ca-bundle.trust.crt" \
@@ -73,16 +70,46 @@ smtpd_tls_key_file = ${smtpd_tls_key_file}
 #
 smtpd_tls_security_level = ${smtpd_tls_security_level}
 
-# Bind to all interfaces so that we are publicly accessible. Overrides config
-# above.
-inet_interfaces = all
-
 EOF
 
-  if command -v /usr/bin/firewall-cmd 2>/dev/null; then
-    logger -t postfix-autodiscovery "Notice: enabling firewall for smtp..."
-    /usr/bin/firewall-cmd --quiet --zone=public --add-service=smtp 2> /dev/null || true
+
+  #
+  # Open up inet_interfaces
+  postconf -c . inet_interfaces=all
+
+fi
+
+if [ -f "/etc/device/services/mail/smtp/tls/tls-client-dns.txt" ]; then
+
+  tls_client_dns=$(head -n 1 /etc/device/services/mail/smtp/tls/tls-client-dns.txt)
+
+  logger -t postfix-autodiscovery "importing postfix client certificate/key..."
+
+  install -m 0750 -d /run/postfix-tls /run/postfix-tls/ca-certs /run/postfix-tls/certs /run/postfix-tls/private
+
+  redwax-tool --pem-in="/etc/pki/tls/private/*" \
+              --pem-in="/etc/pki/tls/certs/ca-bundle.trust.crt" \
+              --pem-in="/etc/pki/tls/certs/*.pem" \
+              --filter=verify \
+              --filter-hostname="${tls_client_dns}" \
+              --filter-current \
+              --cert-out --chain-out --no-key-out \
+              --pem-out="/run/postfix-tls/certs/snmp.crt" \
+              --no-cert-out --no-chain-out --trust-out \
+              --pem-out="/run/postfix-tls/ca-certs/ssl-cacert.pem" \
+              --no-chain-out --no-trust-out --key-out \
+              --pem-out="/run/postfix-tls/private/snmp.key" || echo "Could not import cert/key for tls-client" > "error"
+
+  if test ! -f "error"; then
+    logger -t postfix-autodiscovery "imported postfix client certificate/key."
+  else
+    logger -t postfix-autodiscovery "failed to import postfix client certificate/key."
   fi
+
+  smtp_tls_cert_file="/run/postfix-tls/certs/snmp.crt"
+  smtp_tls_key_file="/run/postfix-tls/private/snmp.key"
+  smtp_tls_security_level="may"
+
 
 fi
 

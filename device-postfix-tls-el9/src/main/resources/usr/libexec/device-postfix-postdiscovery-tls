@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#
+# Postfix Postdiscovery - TLS
+# ===========================
+# 
+# This script autogenerates the inbound TLS configuration for a postfix server.
+
+set -e
+umask 0022
+
+
+#
+# Generate Config
+# ---------------
+#
+
+if [ -f "/etc/device/services/mail/smtp/tls/tls-dns.txt" ]; then
+
+  if command -v /usr/bin/firewall-cmd 2>/dev/null; then
+    logger -t postfix-autodiscovery "Notice: enabling firewall for smtp..."
+    /usr/bin/firewall-cmd --quiet --zone=public --add-service=smtp 2> /dev/null || true
+  fi
+
+fi
+

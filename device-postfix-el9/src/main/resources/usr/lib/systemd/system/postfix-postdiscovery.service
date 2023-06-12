@@ -1,0 +1,18 @@
+# systemd service for managing all postfix postconfiguration.
+
+[Unit]
+Description=Postfix Configuration Postdiscovery
+#Requires=postfix.service
+#PartOf=postfix.service
+#ReloadPropagatedFrom=postfix.service
+After=postfix.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/libexec/device-postfix-postdiscovery
+ExecReload=/bin/bash /usr/libexec/device-postfix-postdiscovery
+RemainAfterExit=on
+
+[Install]
+WantedBy=multi-user.target
+

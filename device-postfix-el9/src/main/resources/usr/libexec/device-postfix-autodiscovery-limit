@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#
+# Postfix Autodiscovery - Limits
+# ==============================
+# 
+# This script autogenerates the limits configuration for a postfix server.
+
+set -e
+umask 0022
+
+
+
+#
+# main.cf - Limits
+# ----------------
+
+if [ -s "/etc/device/services/mail/smtp/message-size-limit.txt" ]; then
+
+  cat >> "main.cf" <<- EOF
+# Note: message size limit from /etc/device/services/mail/smtp/message-size-limit.txt
+# Modify as follows: device services mail smtp set message-size-limit=$(head -n 1 /etc/device/services/mail-server/smtp/message-size-limit.txt)
+message_size_limit = $(head -n 1 /etc/device/services/mail/smtp/message-size-limit.txt)
+
+EOF
+
+fi
+
+
