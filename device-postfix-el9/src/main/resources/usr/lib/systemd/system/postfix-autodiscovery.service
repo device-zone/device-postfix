@@ -9,8 +9,8 @@ Before=postfix.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /usr/libexec/device-postfix-autodiscovery
-ExecReload=/bin/bash /usr/libexec/device-postfix-autodiscovery
+ExecStart=/bin/bash /usr/libexec/device-autodiscovery/postfix
+ExecReload=/bin/bash /usr/libexec/device-autodiscovery/postfix
 RemainAfterExit=on
 
 [Install]

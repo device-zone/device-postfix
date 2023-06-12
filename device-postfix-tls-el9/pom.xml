@@ -91,7 +91,7 @@
           </defineStatements>
           <mappings>
             <mapping>
-              <directory>/usr/libexec/device-postfix-autodiscovery.d</directory>
+              <directory>/usr/libexec/device-autodiscovery/postfix.d</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
@@ -104,7 +104,7 @@
               </sources>
             </mapping>
             <mapping>
-              <directory>/usr/libexec/device-postfix-postdiscovery.d</directory>
+              <directory>/usr/libexec/device-postdiscovery/postfix.d</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
