@@ -153,6 +153,10 @@
                   <location>target/classes/usr/libexec/device-postfix-autodiscovery-milter</location>
                   <destination>30-milter</destination>
                 </source>
+                <source>
+                  <location>target/classes/usr/libexec/device-postfix-autodiscovery-relay</location>
+                  <destination>40-relay</destination>
+                </source>
               </sources>
             </mapping>
             <mapping>
@@ -230,6 +234,70 @@
                 </source>
                 <source>
                   <location>target/classes/usr/libexec/device/services/mail/smtp/set</location>
+                </source>
+              </sources>
+            </mapping>
+            <mapping>
+              <directory>/etc/device/services/mail/smtp/relay/realtime-block-list</directory>
+              <directoryIncluded>true</directoryIncluded>
+              <filemode>2775</filemode>
+              <username>root</username>
+              <groupname>device</groupname>
+            </mapping>
+            <mapping>
+              <directory>/usr/libexec/device/services/mail/smtp/relay/realtime-block-list</directory>
+              <directoryIncluded>true</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+            </mapping>
+            <mapping>
+              <directory>/usr/libexec/device/services/mail/smtp/relay/realtime-block-list</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/realtime-block-list/add</location>
+                </source>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/realtime-block-list/set</location>
+                </source>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/realtime-block-list/remove</location>
+                </source>
+              </sources>
+            </mapping>
+            <mapping>
+              <directory>/etc/device/services/mail/smtp/relay/domain-block-list</directory>
+              <directoryIncluded>true</directoryIncluded>
+              <filemode>2775</filemode>
+              <username>root</username>
+              <groupname>device</groupname>
+            </mapping>
+            <mapping>
+              <directory>/usr/libexec/device/services/mail/smtp/relay/domain-block-list</directory>
+              <directoryIncluded>true</directoryIncluded>
+              <filemode>755</filemode>       
+              <username>root</username>
+              <groupname>root</groupname>
+            </mapping>
+            <mapping>
+              <directory>/usr/libexec/device/services/mail/smtp/relay/domain-block-list</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>    
+              <sources>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/domain-block-list/add</location>
+                </source>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/domain-block-list/set</location>
+                </source>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/domain-block-list/remove</location>
                 </source>
               </sources>
             </mapping>
