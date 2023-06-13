@@ -79,6 +79,41 @@ EOF
 
 fi
 
+
+if test -L "/etc/device/services/mail/smtp/tls/tls-ca-certs.crt"; then
+  smtp_tls_CAfile=$(readlink -f "/etc/device/services/mail/smtp/tls/tls-ca-certs.crt")
+else
+  smtp_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
+fi
+
+smtp_tls_security_level="may"
+
+cat >> "main.cf" <<- EOF
+
+# Note: CA certificate from /etc/device/services/mail/smtp/tls/tls-client-dns.txt.
+
+# OUTBOUND TLS CONFIGURATION
+#
+# The following certificates are used for outbound connections.
+
+# Directory with PEM format Certification Authority certificates that the
+# Postfix SMTP client uses to verify a remote SMTP server certificate.
+#
+smtp_tls_CApath = /etc/pki/tls/certs
+
+# The full pathname of a file containing CA certificates of root CAs
+# trusted to sign either remote SMTP server certificates or intermediate CA
+# certificates.
+#
+smtp_tls_CAfile = ${smtp_tls_CAfile}
+
+# Use TLS if this is supported by the remote SMTP server, otherwise use
+# plaintext (opportunistic TLS outbound).
+#
+smtp_tls_security_level = ${smtp_tls_security_level}
+
+EOF
+
 if [ -f "/etc/device/services/mail/smtp/tls/tls-client-dns.txt" ]; then
 
   tls_client_dns=$(head -n 1 /etc/device/services/mail/smtp/tls/tls-client-dns.txt)
@@ -108,8 +143,15 @@ if [ -f "/etc/device/services/mail/smtp/tls/tls-client-dns.txt" ]; then
 
   smtp_tls_cert_file="/run/postfix-tls/certs/snmp.crt"
   smtp_tls_key_file="/run/postfix-tls/private/snmp.key"
-  smtp_tls_security_level="may"
 
+  cat >> "main.cf" <<- EOF
+
+# Note: client certificates from /etc/device/services/mail/smtp/tls/tls-client-dns.txt.
+
+smtp_tls_cert_file = ${smtp_tls_cert_file}
+smtp_tls_key_file = ${smtp_tls_key_file}
+
+EOF
 
 fi
 
