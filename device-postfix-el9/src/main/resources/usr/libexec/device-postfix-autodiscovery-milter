@@ -1,0 +1,45 @@
+#!/bin/bash
+
+#
+# Postfix Autodiscovery - Milters
+# ===============================
+# 
+# This script autogenerates the milters configuration for a postfix server.
+
+set -e
+umask 0022
+
+
+
+#
+# main.cf - MILTER
+# ----------------
+
+if [ -d "/etc/device/services/mail/smtp/milters" ]; then
+
+  for milter in $(find "/etc/device/services/mail/smtp/milters")
+  do
+    if [ -h "${milter}" ]; then
+      milter_path=$(realpath "${milter}")
+      milter_group=$(ls -l "${milter_path}" | cut -d ' ' -f 4)
+      usermod -a -G "${milter_group}" postfix
+      smtpd_milters+=" unix:"
+      smtpd_milters+="${milter_path}"
+    elif [ -f "${milter}" ]; then
+      smtpd_milters+=" inet:"
+      smtpd_milters+=$(cat "${milter}")
+    fi
+  done
+
+  cat >> "main.cf" <<- EOF
+# MILTERS
+#
+# Configured based on contents of /etc/device/services/mail/smtp/milters
+#
+smtpd_milters =${smtpd_milters}
+
+EOF
+
+fi
+
+

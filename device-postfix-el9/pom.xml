@@ -149,6 +149,10 @@
                   <location>target/classes/usr/libexec/device-postfix-autodiscovery-limit</location>
                   <destination>20-limit</destination>
                 </source>
+                <source>
+                  <location>target/classes/usr/libexec/device-postfix-autodiscovery-milter</location>
+                  <destination>30-milter</destination>
+                </source>
               </sources>
             </mapping>
             <mapping>
