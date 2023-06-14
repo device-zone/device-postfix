@@ -1,0 +1,224 @@
+#!/bin/bash
+
+#
+# Postfix Autodiscovery - LDAP
+# ============================
+# 
+# This script autogenerates the LDAP configuration for a postfix server.
+
+set -e
+umask 0022
+
+
+#
+# main.cf - LDAP
+# --------------
+
+ldap_header() {
+  conf="${1}"
+  uris="${2}"
+
+  cat >> ${conf} <<- EOF
+# Note: ldap enabled because /etc/device/services/mail/ldap/ldap-suffix.d exists
+server_host =${uris}
+bind = sasl
+version = 3
+sasl_mechs = EXTERNAL
+EOF
+
+}
+
+# lmtp setup
+if test -d "/usr/libexec/device/services/mail/imap"; then
+  # dovecot detected
+  logger -t "${0}" "Notice: dovecot detected by postfix, using lmtp..."
+  #mailbox_transport="lmtp:unix:/run/dovecot/lmtp"
+  virtual_transport="${mailbox_transport}"
+else
+  logger -t "${0}" "Notice: no external LDA detected by postfix, using local/virtual..."
+  #mailbox_transport=local
+  virtual_transport=virtual
+fi
+
+
+line="/etc/device/services/mail/ldap"
+
+if [ -L "$line/ldap-suffix.d" ]; then
+
+  # ldap instance if present
+  ldap_instance=""
+  if test -f "$line/ldap-suffix.d/instance.d/name.txt"; then
+    ldap_instance="$(head -n 1 $line/ldap-suffix.d/instance.d/name.txt)"
+  else
+    logger -t "${0}" "Error: LDAP enabled, but $line/ldap-suffix.d/instance.d/name.txt missing, mailserver will exit."
+    exit 1
+  fi
+  # ldap suffix if present
+  ldap_suffix=""
+  if test -f "$line/ldap-suffix.d/suffix.txt"; then
+    ldap_suffix="$(head -n 1 $line/ldap-suffix.d/suffix.txt)"
+  else
+    logger -t "${0}" "Error: LDAP enabled, but $line/ldap-suffix.d/suffix.txt missing, mailserver will exit."
+    exit 1
+  fi
+
+  uris="ldapi://%2frun%2fslapd-${ldap_instance}.socket"
+
+
+  # handle acceptdomains
+  acceptdomains_cf="acceptdomains.cf"
+
+  ldap_header "${acceptdomains_cf}" "${uris}"
+
+  cat >> ${acceptdomains_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (&(associatedDomain=%s)(!(associatedDomain=${myhostname})))
+result_attribute = associatedDomain
+EOF
+
+  install -m 0640 -g mail "${acceptdomains_cf}" "/etc/postfix/acceptdomains.cf"
+
+
+  # handle virtual accounts
+  ldapvirtual_cf="ldapvirtual.cf"
+
+  ldap_header "${ldapvirtual_cf}" "${uris}"
+
+  cat >> ${ldapvirtual_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (&(|(mail=%s)(mailAlternateAddress=%s))(mailHost=${myhostname}))
+result_attribute = mail
+result_filter = %s/
+
+EOF
+
+  install -m 0640 -g mail "${ldapvirtual_cf}" "/etc/postfix/ldapvirtual.cf"
+
+
+  # handle forward accounts
+  ldapforward_cf="ldapforward.cf"
+
+  ldap_header "${ldapforward_cf}" "${uris}"
+
+  cat >> ${ldapforward_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (&(|(mail=%s)(mailAlternateAddress=%s))(mailForwardingAddress=*))
+result_attribute = mailForwardingAddress
+
+EOF
+
+  install -m 0640 -g mail "${ldapforward_cf}" "/etc/postfix/ldapforward.cf"
+
+
+  # handle alias accounts
+  ldapalias_cf="ldapalias.cf"
+
+  ldap_header "${ldapalias_cf}" "${uris}"
+
+  cat >> ${ldapalias_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (|(mail=%s)(mailAlternateAddress=%s))
+result_attribute = mail
+
+EOF
+
+  install -m 0640 -g mail "${ldapalias_cf}" "/etc/postfix/ldapalias.cf"
+
+  # handle local accounts
+  ldaplocal_cf="ldaplocal.cf"
+
+  ldap_header "${ldaplocal_cf}"
+
+  cat >> ${ldaplocal_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (&(|(mail=%s)(mailAlternateAddress=%s))(mailHost=${myhostname}))
+result_attribute = mailHost
+result_filter = dovecot
+
+EOF
+
+  install -m 0640 -g mail "${ldaplocal_cf}" "/etc/postfix/ldaplocal.cf"
+
+
+  # handle remote accounts
+  ldapremote_cf="ldapremote.cf"
+
+  ldap_header "${ldapremote_cf}"
+
+  cat >> ${ldapremote_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (&(|(mail=%s)(mailAlternateAddress=%s))(!(mailHost=${myhostname})))
+result_attribute = mailHost
+result_filter = smtp:%s
+
+EOF
+
+  install -m 0640 -g mail "${ldapremote_cf}" "/etc/postfix/ldapremote.cf"
+
+
+  # handle mailman lists
+  ldapmailman_cf="ldapmailman.cf"
+
+  ldap_header "${ldapmailman_cf}"
+
+  cat >> ${ldapmailman_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (&(|(mail=%s)(mailAlternateAddress=%s))(mailHost=${myhostname})(mailProgramDeliveryInfo=mailman))
+result_attribute = mail
+result_filter = mailman:
+
+EOF
+
+  install -m 0640 -g mail "${ldapmailman_cf}" "/etc/postfix/ldapmailman.cf"
+
+
+
+  # main ldap config
+  cat >> "main.cf" <<- EOF
+
+virtual_mailbox_domains = ldap:/etc/postfix/acceptdomains.cf
+
+# ADDRESS REDIRECTION (VIRTUAL DOMAIN)
+#
+# The VIRTUAL_README document gives information about the many forms
+# of domain hosting that Postfix supports.
+virtual_transport = "${virtual_transport}"
+virtual_mailbox_base = /
+virtual_mailbox_maps = ldap:ldapvirtual
+virtual_uid_maps = static:vmail
+virtual_gid_maps = static:vmail
+virtual_minimum_uid = 0
+virtual_mailbox_limit = 0
+
+
+virtual_alias_maps = ldap:/etc/postfix/ldapforward.cf, ldap:/etc/postfix/ldapalias.cf
+
+# TRANSPORT MAP
+#
+# See the discussion in the ADDRESS_REWRITING_README document.
+transport_maps = ldap:/etc/postfix/ldapremote.cf ldap:/etc/postfix/ldapmailman.cf ldap:/etc/postfix/ldaplocal.cf
+
+
+EOF
+
+
+  # master ldap config
+  cat >> "master.cf" <<- EOF
+#
+# ====================================================================
+#
+dovecot   unix  -       n       n       -       -       pipe
+  flags=DRhu user=vmail:vmail argv=/usr/libexec/dovecot/dovecot-lda -f \${sender} -a \${original_recipient} -d \${user}@\${nexthop}
+EOF
+
+fi
+
+
+
