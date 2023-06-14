@@ -116,32 +116,6 @@
                 </source>
               </sources>
             </mapping>
-            <mapping>
-              <directory>/etc/device/services/mail/smtp/tls</directory>
-              <directoryIncluded>true</directoryIncluded>
-              <filemode>2775</filemode>
-              <username>root</username>
-              <groupname>device</groupname>
-            </mapping>
-            <mapping>
-              <directory>/usr/libexec/device/services/mail/smtp/tls</directory>
-              <directoryIncluded>true</directoryIncluded>
-              <filemode>755</filemode>
-              <username>root</username>
-              <groupname>root</groupname>
-            </mapping>
-            <mapping>
-              <directory>/usr/libexec/device/services/mail/smtp/tls</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>755</filemode>
-              <username>root</username>
-              <groupname>root</groupname>
-              <sources>
-                <source>
-                  <location>target/classes/usr/libexec/device/services/mail/smtp/tls/set</location>
-                </source>
-              </sources>
-            </mapping>
           </mappings>
           <preremoveScriptlet>
             <scriptFile>target/classes/preremove</scriptFile>
@@ -149,6 +123,7 @@
           </preremoveScriptlet>
           <requires>
             <require>device-postfix</require>
+            <require>device-mail-tls</require>
             <require>redwax-tool</require>
           </requires>
         </configuration>

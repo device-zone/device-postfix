@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#
+# Postfix Autodiscovery - Relay Host
+# ==================================
+# 
+# This script autogenerates the relayhost configuration for a postfix server.
+
+set -e
+umask 0022
+
+
+
+#
+# main.cf - Relayhost
+# -------------------
+
+if [ -s "/etc/device/services/mail/smtp/relayhost.txt" ]; then
+
+  cat >> "main.cf" <<- EOF
+
+# Note: relayhost from /etc/device/services/mail/smtp/relayhost.txt
+# Modify as follows: device services mail smtp set relayhost=$(head -n 1 /etc/device/services/mail/smtp/relayhost.txt)
+relayhost = $(head -n 1 /etc/device/services/mail/smtp/relayhost.txt)
+
+EOF
+
+fi
+
+

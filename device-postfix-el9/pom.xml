@@ -157,6 +157,10 @@
                   <location>target/classes/usr/libexec/device-postfix-autodiscovery-relay</location>
                   <destination>40-relay</destination>
                 </source>
+                <source>
+                  <location>target/classes/usr/libexec/device-postfix-autodiscovery-relayhost</location>
+                  <destination>50-relayhost</destination>
+                </source>
               </sources>
             </mapping>
             <mapping>

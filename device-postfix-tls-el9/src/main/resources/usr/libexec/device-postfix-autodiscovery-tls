@@ -17,9 +17,9 @@ umask 0022
 
 install -m 0750 -d /run/postfix-tls /run/postfix-tls/ca-certs /run/postfix-tls/certs /run/postfix-tls/private
 
-if [ -f "/etc/device/services/mail/smtp/tls/tls-dns.txt" ]; then
+if [ -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
 
-  tls_dns=$(head -n 1 /etc/device/services/mail/smtp/tls/tls-dns.txt)
+  tls_dns=$(head -n 1 /etc/device/services/mail/tls/tls-dns.txt)
 
   logger -t postfix-autodiscovery "importing postfix server certificate/key..."
 
@@ -47,7 +47,7 @@ if [ -f "/etc/device/services/mail/smtp/tls/tls-dns.txt" ]; then
   smtpd_tls_security_level="may"
 
   cat >> "main.cf" <<- EOF
-# Note: certificate from /etc/device/services/mail/smtp/tls/tls-dns.txt
+# Note: certificate from /etc/device/services/mail/tls/tls-dns.txt
 
 # INBOUND TLS CONFIGURATION
 #
@@ -80,8 +80,8 @@ EOF
 fi
 
 
-if test -L "/etc/device/services/mail/smtp/tls/tls-ca-certs.crt"; then
-  smtp_tls_CAfile=$(readlink -f "/etc/device/services/mail/smtp/tls/tls-ca-certs.crt")
+if test -L "/etc/device/services/mail/tls/tls-ca-certs.crt"; then
+  smtp_tls_CAfile=$(readlink -f "/etc/device/services/mail/tls/tls-ca-certs.crt")
 else
   smtp_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
 fi
@@ -90,7 +90,7 @@ smtp_tls_security_level="may"
 
 cat >> "main.cf" <<- EOF
 
-# Note: CA certificate from /etc/device/services/mail/smtp/tls/tls-client-dns.txt.
+# Note: CA certificate from /etc/device/services/mail/tls/tls-client-dns.txt.
 
 # OUTBOUND TLS CONFIGURATION
 #
@@ -114,9 +114,9 @@ smtp_tls_security_level = ${smtp_tls_security_level}
 
 EOF
 
-if [ -f "/etc/device/services/mail/smtp/tls/tls-client-dns.txt" ]; then
+if [ -f "/etc/device/services/mail/tls/tls-client-dns.txt" ]; then
 
-  tls_client_dns=$(head -n 1 /etc/device/services/mail/smtp/tls/tls-client-dns.txt)
+  tls_client_dns=$(head -n 1 /etc/device/services/mail/tls/tls-client-dns.txt)
 
   logger -t postfix-autodiscovery "importing postfix client certificate/key..."
 
@@ -146,7 +146,7 @@ if [ -f "/etc/device/services/mail/smtp/tls/tls-client-dns.txt" ]; then
 
   cat >> "main.cf" <<- EOF
 
-# Note: client certificates from /etc/device/services/mail/smtp/tls/tls-client-dns.txt.
+# Note: client certificates from /etc/device/services/mail/tls/tls-client-dns.txt.
 
 smtp_tls_cert_file = ${smtp_tls_cert_file}
 smtp_tls_key_file = ${smtp_tls_key_file}

@@ -3,6 +3,7 @@
 [Unit]
 Description=Postfix Configuration Postdiscovery
 #Requires=postfix.service
+PartOf=mail-postdiscovery.target
 #PartOf=postfix.service
 #ReloadPropagatedFrom=postfix.service
 After=postfix.service
@@ -15,4 +16,5 @@ RemainAfterExit=on
 
 [Install]
 WantedBy=multi-user.target
+WantedBy=mail-postdiscovery.target
 

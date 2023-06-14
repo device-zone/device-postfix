@@ -3,7 +3,7 @@
 [Unit]
 Description=Postfix Configuration Autodiscovery
 #Requires=postfix.service
-#PartOf=postfix.service
+PartOf=mail-autodiscovery.target
 #ReloadPropagatedFrom=postfix.service
 Before=postfix.service
 
@@ -15,4 +15,5 @@ RemainAfterExit=on
 
 [Install]
 WantedBy=multi-user.target
+WantedBy=mail-autodiscovery.target
 
