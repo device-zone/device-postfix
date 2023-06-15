@@ -95,6 +95,19 @@
                 </source>
               </sources>
             </mapping>
+            <mapping>
+              <directory>/usr/libexec/device-postdiscovery/389ds.d</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/libexec/device-389ds-postdiscovery-postfix</location>
+                  <destination>90-postfix</destination>
+                </source>
+              </sources>
+            </mapping>
           </mappings>
           <requires>
             <require>postfix-ldap</require>
