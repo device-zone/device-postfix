@@ -30,11 +30,11 @@ if [ -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
               --filter-hostname="${tls_dns}" \
               --filter-current \
               --cert-out --chain-out --no-key-out \
-              --pem-out="/run/postfix-tls/certs/snmpd.crt" \
+              --pem-out="/run/postfix-tls/certs/smtpd.crt" \
               --no-cert-out --no-chain-out --trust-out \
               --pem-out="/run/postfix-tls/ca-certs/ssl-cacert.pem" \
               --no-chain-out --no-trust-out --key-out \
-              --pem-out="/run/postfix-tls/private/snmpd.key" || echo "Could not import cert/key for tls" > "error"
+              --pem-out="/run/postfix-tls/private/smtpd.key" || echo "Could not import cert/key for tls" > "error"
 
   if test ! -f "error"; then
     logger -t postfix-autodiscovery "imported postfix server certificate/key."
@@ -42,8 +42,8 @@ if [ -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
     logger -t postfix-autodiscovery "failed to import postfix server certificate/key."
   fi
 
-  smtpd_tls_cert_file="/run/postfix-tls/certs/snmpd.crt"
-  smtpd_tls_key_file="/run/postfix-tls/private/snmpd.key"
+  smtpd_tls_cert_file="/run/postfix-tls/certs/smtpd.crt"
+  smtpd_tls_key_file="/run/postfix-tls/private/smtpd.key"
   smtpd_tls_security_level="may"
 
   cat >> "main.cf" <<- EOF
@@ -129,11 +129,11 @@ if [ -f "/etc/device/services/mail/tls/tls-client-dns.txt" ]; then
               --filter-hostname="${tls_client_dns}" \
               --filter-current \
               --cert-out --chain-out --no-key-out \
-              --pem-out="/run/postfix-tls/certs/snmp.crt" \
+              --pem-out="/run/postfix-tls/certs/smtp.crt" \
               --no-cert-out --no-chain-out --trust-out \
               --pem-out="/run/postfix-tls/ca-certs/ssl-cacert.pem" \
               --no-chain-out --no-trust-out --key-out \
-              --pem-out="/run/postfix-tls/private/snmp.key" || echo "Could not import cert/key for tls-client" > "error"
+              --pem-out="/run/postfix-tls/private/smtp.key" || echo "Could not import cert/key for tls-client" > "error"
 
   if test ! -f "error"; then
     logger -t postfix-autodiscovery "imported postfix client certificate/key."
@@ -141,8 +141,8 @@ if [ -f "/etc/device/services/mail/tls/tls-client-dns.txt" ]; then
     logger -t postfix-autodiscovery "failed to import postfix client certificate/key."
   fi
 
-  smtp_tls_cert_file="/run/postfix-tls/certs/snmp.crt"
-  smtp_tls_key_file="/run/postfix-tls/private/snmp.key"
+  smtp_tls_cert_file="/run/postfix-tls/certs/smtp.crt"
+  smtp_tls_key_file="/run/postfix-tls/private/smtp.key"
 
   cat >> "main.cf" <<- EOF
 
