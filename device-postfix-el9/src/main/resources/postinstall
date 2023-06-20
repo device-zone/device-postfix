@@ -1,7 +1,9 @@
 if [ $1 = 1 ]; then
 
+  # Default is disabled
+  install -m 660 -g device /etc/device/services/mail/smtp/disabled.bin
+
   # Register the service
-  /usr/bin/systemctl enable postfix.service
   /usr/bin/systemctl enable postfix-autodiscovery.service
 fi
 

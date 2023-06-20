@@ -5,18 +5,18 @@ umask 0002
 
 if [ "$1" == "--" ]; then
 
-  /usr/bin/sudo /usr/bin/systemctl --quiet enable postfix-autodiscovery.service
   /usr/bin/sudo /usr/bin/systemctl --quiet enable postfix.service
 
-  if test -f "enabled"; then
+  if test ! -f "disabled.bin"; then
     echo "smtp is already enabled."
-  elif test -f "disabled"; then
-    mv "disabled" "enabled"
-    /usr/bin/sudo /usr/bin/systemctl restart postfix-autodiscovery.service
-    /usr/bin/sudo /usr/bin/systemctl restart postfix.service
   else
-    touch "enabled"
-    echo "smtp will be enabled on next reboot."
+    rm "disabled.bin"
+    if systemctl is-active --quiet postfix-autodiscovery.service; then
+      /usr/bin/sudo /usr/bin/systemctl restart postfix-autodiscovery.service
+      /usr/bin/sudo /usr/bin/systemctl restart postfix.service
+    else
+      echo "smtp will be enabled on next reboot."
+    fi
   fi
 
 fi
