@@ -26,7 +26,7 @@ dsidm -b "cn=config" ${uris} organizationalunit create --ou people >/dev/null ||
 
 dsidm -b "cn=config" ${uris} user create --uid postfix --cn postfix --displayName "Postfix Server" --uidNumber `id -u postfix` --gidNumber `id -g postfix` --homeDirectory "`echo ~postfix`" >/dev/null || /bin/true
 
-aci='(targetattr != "userPassword")(version 3.0;acl "Apache Daemon";allow (read,search,compare) (userdn = "ldap:///uid=postfix,ou=people,cn=config");)'
+aci='(targetattr != "userPassword")(version 3.0;acl "Postfix Daemon";allow (read,search,compare) (userdn = "ldap:///uid=postfix,ou=people,cn=config");)'
 
 logger -t "${0}" "Notice: attempting to add postfix aci on instance '${instance}'..."
 logger -t "${0}" "Notice: postfix aci: ${aci}"
