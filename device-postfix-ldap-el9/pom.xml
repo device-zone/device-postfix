@@ -110,6 +110,7 @@
             </mapping>
           </mappings>
           <requires>
+            <require>postfix-ldap</require>
             <require>device-mail</require>
             <require>device-mail-ldap</require>
             <require>device-postfix</require>
