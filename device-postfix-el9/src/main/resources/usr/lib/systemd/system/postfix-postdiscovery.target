@@ -1,0 +1,9 @@
+# systemd service for managing all postfix postconfiguration.
+
+[Unit]
+Description=Postfix Configuration Postdiscovery
+After=postfix-autodiscovery.target
+
+[Install]
+WantedBy=multi-user.target
+

@@ -13,6 +13,7 @@ if [ "$1" == "--" ]; then
     touch "disabled.bin"
     if systemctl is-active --quiet postfix-autodiscovery.service; then
       /usr/bin/sudo /usr/bin/systemctl stop postfix.service
+      /usr/bin/sudo /usr/bin/systemctl disable postfix.service
     else
       echo "smtp will be disabled on next reboot."
     fi

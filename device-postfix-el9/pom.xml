@@ -194,6 +194,10 @@
                   <location>target/classes/usr/lib/systemd/system/postfix-autodiscovery.service</location>
                   <destination>postfix-autodiscovery.service</destination>
                 </source>
+                <source>
+                  <location>target/classes/usr/lib/systemd/system/postfix-autodiscovery.target</location>
+                  <destination>postfix-autodiscovery.target</destination>
+                </source>
               </sources>
             </mapping>
             <mapping>
@@ -206,6 +210,10 @@
                 <source>
                   <location>target/classes/usr/lib/systemd/system/postfix-postdiscovery.service</location>
                   <destination>postfix-postdiscovery.service</destination>
+                </source>
+                <source>
+                  <location>target/classes/usr/lib/systemd/system/postfix-postdiscovery.target</location>
+                  <destination>postfix-postdiscovery.target</destination>
                 </source>
               </sources>
             </mapping>

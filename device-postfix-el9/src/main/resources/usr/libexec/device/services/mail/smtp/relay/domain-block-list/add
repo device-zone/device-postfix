@@ -12,8 +12,9 @@ if [ "$1" == "--" ]; then
 
   /usr/libexec/device-set ${OPTIONS} "$@"
 
-  /usr/bin/sudo /usr/bin/systemctl try-reload-or-restart postfix-autodiscovery.service
+  /usr/bin/sudo /usr/bin/systemctl try-reload-or-restart postfix-autodiscovery.target
   /usr/bin/sudo /usr/bin/systemctl try-reload-or-restart postfix.service
+  /usr/bin/sudo /usr/bin/systemctl try-reload-or-restart postfix-postdiscovery.target
 
 elif [ "$1" == "-c" ]; then
 
