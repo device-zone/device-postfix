@@ -9,6 +9,7 @@
 set -e
 umask 0022
 
+myhostname=$(cat /etc/hostname)
 
 #
 # main.cf - LDAP
