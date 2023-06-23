@@ -216,7 +216,7 @@ EOF
 # ====================================================================
 #
 dovecot   unix  -       n       n       -       -       pipe
-  flags=DRhu user=vmail:vmail argv=/usr/libexec/dovecot/dovecot-lda -f \${sender} -a \${original_recipient} -d \${user}@\${nexthop}
+  flags=DRhu user=vmail:vmail argv=/usr/libexec/dovecot/dovecot-lda -f \$sender -a \$original_recipient -d \$user@\$nexthop
 EOF
 
 fi
