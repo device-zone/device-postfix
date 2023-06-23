@@ -20,7 +20,7 @@ ldap_header() {
 
   cat >> ${conf} <<- EOF
 # Note: ldap enabled because /etc/device/services/mail/ldap/ldap-suffix.d exists
-server_host =${uris}
+server_host = ${uris}
 bind = sasl
 version = 3
 sasl_mechs = EXTERNAL
@@ -131,7 +131,7 @@ EOF
   # handle local accounts
   ldaplocal_cf="ldaplocal.cf"
 
-  ldap_header "${ldaplocal_cf}"
+  ldap_header "${ldaplocal_cf}" "${uris}"
 
   cat >> ${ldaplocal_cf} <<- EOF
 # Note: base set from $line/ldap-suffix.d/suffix.txt
@@ -148,7 +148,7 @@ EOF
   # handle remote accounts
   ldapremote_cf="ldapremote.cf"
 
-  ldap_header "${ldapremote_cf}"
+  ldap_header "${ldapremote_cf}" "${uris}"
 
   cat >> ${ldapremote_cf} <<- EOF
 # Note: base set from $line/ldap-suffix.d/suffix.txt
@@ -165,7 +165,7 @@ EOF
   # handle mailman lists
   ldapmailman_cf="ldapmailman.cf"
 
-  ldap_header "${ldapmailman_cf}"
+  ldap_header "${ldapmailman_cf}" "${uris}"
 
   cat >> ${ldapmailman_cf} <<- EOF
 # Note: base set from $line/ldap-suffix.d/suffix.txt
