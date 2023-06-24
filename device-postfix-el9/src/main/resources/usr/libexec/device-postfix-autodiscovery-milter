@@ -15,16 +15,17 @@ umask 0022
 # main.cf - MILTER
 # ----------------
 
-if [ -d "/etc/device/services/mail/smtp/milters" ]; then
+if [ -d "/run/milters" ]; then
 
-  for milter in $(find "/etc/device/services/mail/smtp/milters" | sort)
+  for milter in $(find "/run/milters" | sort)
   do
     if [ -h "${milter}" ]; then
-      milter_path=$(realpath -m "${milter}")
-      milter_group=$(ls -l "${milter_path}" | cut -d ' ' -f 4)
+      milter_socket=$(realpath -m "${milter}")
+      milter_path=$(dirname "${milter_socket}")
+      milter_group=$(stat -c %G "${milter_path}")
       usermod -a -G "${milter_group}" postfix
       smtpd_milters+=" unix:"
-      smtpd_milters+="${milter_path}"
+      smtpd_milters+="${milter_socket}"
     elif [ -f "${milter}" ]; then
       smtpd_milters+=" inet:"
       smtpd_milters+=$(cat "${milter}")
@@ -34,7 +35,7 @@ if [ -d "/etc/device/services/mail/smtp/milters" ]; then
   cat >> "main.cf" <<- EOF
 # MILTERS
 #
-# Configured based on contents of /etc/device/services/mail/smtp/milters
+# Configured based on contents of /run/milters
 #
 smtpd_milters =${smtpd_milters}
 
