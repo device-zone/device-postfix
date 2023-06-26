@@ -3,23 +3,23 @@
 set -e
 umask 0002
 
-OPTIONS="--polar disabled --hostname hostname --bytes message-size-limit --fqdn relayhost"
+OPTIONS="--polar disabled --fqdn hostname --bytes message-size-limit --fqdn relayhost"
 
 if [ "$1" == "--" ]; then
 
   /usr/libexec/device-set ${OPTIONS} "$@"
 
   if test -f "disabled.bin"; then
+    /usr/bin/sudo /usr/bin/systemctl --quiet disable postfix.service
     if systemctl is-active --quiet postfix-autodiscovery.service; then
       /usr/bin/sudo /usr/bin/systemctl stop postfix.service
-      /usr/bin/sudo /usr/bin/systemctl disable postfix.service
     else
       echo "smtp will be disabled on next reboot."
     fi
   else
+    /usr/bin/sudo /usr/bin/systemctl --quiet enable postfix.service
     if systemctl is-active --quiet postfix-autodiscovery.service; then
       /usr/bin/sudo /usr/bin/systemctl restart postfix-autodiscovery.target
-      /usr/bin/sudo /usr/bin/systemctl enable postfix.service
       /usr/bin/sudo /usr/bin/systemctl restart postfix.service
       /usr/bin/sudo /usr/bin/systemctl restart postfix-postdiscovery.target
     else
