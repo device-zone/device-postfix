@@ -117,6 +117,10 @@
               </sources>
             </mapping>
           </mappings>
+          <postinstallScriptlet>
+            <scriptFile>target/classes/postinstall</scriptFile>
+            <fileEncoding>utf-8</fileEncoding>
+          </postinstallScriptlet>
           <preremoveScriptlet>
             <scriptFile>target/classes/preremove</scriptFile>
             <fileEncoding>utf-8</fileEncoding>
