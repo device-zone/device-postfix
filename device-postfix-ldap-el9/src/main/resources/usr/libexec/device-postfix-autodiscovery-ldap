@@ -180,6 +180,21 @@ EOF
   install -m 0640 -g mail "${ldapmailman_cf}" "/etc/postfix/ldapmailman.cf"
 
 
+  # handle relay clientcerts
+  ldaprelay_clientcerts_cf="ldaprelayclientcerts.cf"
+
+  ldap_header "${ldaprelay_clientcerts_cf}" "${uris}"
+
+  cat >> ${ldaprelay_clientcerts_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (serialNumber=%s)
+result_attribute = serialNumber
+
+EOF
+
+  install -m 0640 -g mail "${ldaprelay_clientcerts_cf}" "/etc/postfix/ldaprelay_clientcerts.cf"
+
 
   # main ldap config
   cat >> "main.cf" <<- EOF
@@ -206,6 +221,11 @@ virtual_alias_maps = ldap:/etc/postfix/ldapforward.cf, ldap:/etc/postfix/ldapali
 # See the discussion in the ADDRESS_REWRITING_README document.
 transport_maps = ldap:/etc/postfix/ldapremote.cf ldap:/etc/postfix/ldapmailman.cf ldap:/etc/postfix/ldaplocal.cf
 
+
+# TLS RELAY CLIENT CERTS
+#
+# Fingerprints of keys allowed to relay
+relay_clientcerts = ldap:/etc/postfix/ldaprelay_clientcerts.cf
 
 EOF
 

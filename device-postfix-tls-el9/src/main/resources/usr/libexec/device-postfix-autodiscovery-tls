@@ -42,6 +42,12 @@ if [ -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
     logger -t postfix-autodiscovery "failed to import postfix server certificate/key."
   fi
 
+if test -L "/etc/device/services/mail/tls/tls-client-ca.crt"; then
+  smtpd_tls_CAfile=$(readlink -f "/etc/device/services/mail/tls/tls-client-ca.crt")
+else
+  smtpd_tls_CAfile=
+fi
+
   smtpd_tls_cert_file="/run/postfix/certs/smtpd.crt"
   smtpd_tls_key_file="/run/postfix/private/smtpd.key"
   smtpd_tls_security_level="may"
@@ -65,10 +71,36 @@ smtpd_tls_cert_file = ${smtpd_tls_cert_file}
 #
 smtpd_tls_key_file = ${smtpd_tls_key_file}
 
+# A file containing (PEM format) CA certificates of root CAs trusted to
+# sign either remote SMTP client certificates or intermediate CA
+# certificates.
+#
+smtpd_tls_CAfile = ${smtpd_tls_CAfile}
+
 # Announce STARTTLS support to remote SMTP clients, but do not require that
 # clients use TLS encryption (opportunistic TLS inbound).
 #
 smtpd_tls_security_level = ${smtpd_tls_security_level}
+
+# When TLS encryption is optional in the Postfix SMTP server, do not
+# announce or accept SASL authentication over unencrypted connections.
+#
+smtpd_tls_auth_only = yes
+
+# Ask a remote SMTP client for a client certificate. This information is
+# needed for certificate based mail relaying with, for example, the
+# permit_tls_clientcerts feature.
+#
+smtpd_tls_ask_ccert = yes
+
+# Request that the Postfix SMTP server produces Received: message headers that
+# include information about the protocol and cipher used, as well as the
+# remote SMTP client CommonName and client certificate issuer CommonName. This
+# is disabled by default, as the information may be modified in transit
+# through other mail servers. Only information that was recorded by the final
+# destination can be trusted.
+#
+smtpd_tls_received_header = yes
 
 EOF
 
@@ -80,8 +112,8 @@ EOF
 fi
 
 
-if test -L "/etc/device/services/mail/tls/tls-ca-certs.crt"; then
-  smtp_tls_CAfile=$(readlink -f "/etc/device/services/mail/tls/tls-ca-certs.crt")
+if test -L "/etc/device/services/mail/tls/tls-ca.crt"; then
+  smtp_tls_CAfile=$(readlink -f "/etc/device/services/mail/tls/tls-ca.crt")
 else
   smtp_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
 fi
@@ -99,7 +131,7 @@ cat >> "main.cf" <<- EOF
 # Directory with PEM format Certification Authority certificates that the
 # Postfix SMTP client uses to verify a remote SMTP server certificate.
 #
-smtp_tls_CApath = /etc/pki/tls/certs
+smtp_tls_CApath =
 
 # The full pathname of a file containing CA certificates of root CAs
 # trusted to sign either remote SMTP server certificates or intermediate CA
@@ -148,6 +180,7 @@ if [ -f "/etc/device/services/mail/tls/tls-client-dns.txt" ]; then
 
 # Note: client certificates from /etc/device/services/mail/tls/tls-client-dns.txt.
 
+# File with the Postfix SMTP client RSA certificate in PEM format.
 smtp_tls_cert_file = ${smtp_tls_cert_file}
 smtp_tls_key_file = ${smtp_tls_key_file}
 
