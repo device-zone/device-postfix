@@ -64,7 +64,7 @@ done
 # ------------------------
 #
 
-install -m 640 "main.cf" "/etc/postfix/main.cf"
-install -m 640 "master.cf" "/etc/postfix/master.cf"
+install -m 644 "main.cf" "/etc/postfix/main.cf"
+install -m 644 "master.cf" "/etc/postfix/master.cf"
 
 
