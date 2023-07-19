@@ -128,7 +128,7 @@
           <requires>
             <require>device-postfix</require>
             <require>device-mail-tls</require>
-            <require>redwax-tool</require>
+            <require>redwax-tool &gt;= 0.9.3</require>
           </requires>
         </configuration>
       </plugin>

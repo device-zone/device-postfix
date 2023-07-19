@@ -29,12 +29,12 @@ if [ -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
               --filter=verify \
               --filter-hostname="${tls_dns}" \
               --filter-current \
-              --cert-out --chain-out --no-key-out \
-              --pem-out="/run/postfix/certs/smtpd.crt" \
-              --no-cert-out --no-chain-out --trust-out \
-              --pem-out="/run/postfix/ca-certs/ssl-cacert.pem" \
-              --no-chain-out --no-trust-out --key-out \
-              --pem-out="/run/postfix/private/smtpd.key" || echo "Could not import cert/key for tls" > "error"
+              --parameter-out --order-out=key-first \
+              --cert-out --chain-out --key-out \
+              --pem-out="/run/postfix/private/smtpd.crt" \
+              --order-out=all \
+              --no-cert-out --no-chain-out --no-key-out --trust-out \
+              --pem-out="/run/postfix/ca-certs/ssl-cacert.pem" || echo "Could not import cert/key for tls" > "error"
 
   if test ! -f "error"; then
     logger -t postfix-autodiscovery "imported postfix server certificate/key."
@@ -48,8 +48,8 @@ else
   smtpd_tls_CAfile=
 fi
 
-  smtpd_tls_cert_file="/run/postfix/certs/smtpd.crt"
-  smtpd_tls_key_file="/run/postfix/private/smtpd.key"
+  smtpd_tls_chain_files="/run/postfix/private/smtpd.crt"
+
   smtpd_tls_security_level="may"
 
   cat >> "main.cf" <<- EOF
@@ -59,17 +59,22 @@ fi
 #
 # The following certificates are used for inbound connections.
 
-# The full pathname of a file with the Postfix SMTP server RSA certificate
-# in PEM format. Intermediate certificates should be included in general,
-# the server certificate first, then the issuing CA(s) (bottom-up order).
+# List of one or more PEM files, each holding one or more private keys
+# directly followed by a corresponding certificate chain. The file names
+# are separated by commas and/or whitespace.
 #
-smtpd_tls_cert_file = ${smtpd_tls_cert_file}
-
-# The full pathname of a file with the Postfix SMTP server RSA private key
-# in PEM format. The private key must be accessible without a pass-phrase,
-# i.e. it must not be encrypted.
+# Each key must appear immediately before the corresponding certificate,
+# optionally followed by additional issuer certificates that complete the
+# certificate chain for that key. When multiple files are specified, they
+# are equivalent to a single file that is concatenated from those files
+# in the given order. Thus, while a key must always precede its certificate
+# and issuer chain, it can be in a separate file, so long as that file is
+# listed immediately before the file that holds the corresponding
+# certificate chain. Once all the files are concatenated, the sequence of
+# PEM objects must be: key1, cert1, [chain1], key2, cert2, [chain2], ...,
+# keyN, certN, [chainN].
 #
-smtpd_tls_key_file = ${smtpd_tls_key_file}
+smtpd_tls_chain_files = ${smtpd_tls_chain_files}
 
 # A file containing (PEM format) CA certificates of root CAs trusted to
 # sign either remote SMTP client certificates or intermediate CA
@@ -160,12 +165,12 @@ if [ -f "/etc/device/services/mail/tls/tls-client-dns.txt" ]; then
               --filter=verify \
               --filter-hostname="${tls_client_dns}" \
               --filter-current \
-              --cert-out --chain-out --no-key-out \
-              --pem-out="/run/postfix/certs/smtp.crt" \
-              --no-cert-out --no-chain-out --trust-out \
-              --pem-out="/run/postfix/ca-certs/ssl-cacert.pem" \
-              --no-chain-out --no-trust-out --key-out \
-              --pem-out="/run/postfix/private/smtp.key" || echo "Could not import cert/key for tls-client" > "error"
+              --parameter-out --order-out=key-first \
+              --cert-out --chain-out --key-out \
+              --pem-out="/run/postfix/private/smtp.crt" \
+              --order-out=all \
+              --no-cert-out --no-chain-out --no-key-out --trust-out \
+              --pem-out="/run/postfix/ca-certs/ssl-cacert.pem" || echo "Could not import cert/key for tls-client" > "error"
 
   if test ! -f "error"; then
     logger -t postfix-autodiscovery "imported postfix client certificate/key."
@@ -173,16 +178,28 @@ if [ -f "/etc/device/services/mail/tls/tls-client-dns.txt" ]; then
     logger -t postfix-autodiscovery "failed to import postfix client certificate/key."
   fi
 
-  smtp_tls_cert_file="/run/postfix/certs/smtp.crt"
-  smtp_tls_key_file="/run/postfix/private/smtp.key"
+  smtp_tls_chain_files="/run/postfix/private/smtp.crt"
 
   cat >> "main.cf" <<- EOF
 
 # Note: client certificates from /etc/device/services/mail/tls/tls-client-dns.txt.
 
-# File with the Postfix SMTP client RSA certificate in PEM format.
-smtp_tls_cert_file = ${smtp_tls_cert_file}
-smtp_tls_key_file = ${smtp_tls_key_file}
+# List of one or more PEM files, each holding one or more private keys
+# directly followed by a corresponding certificate chain. The file names
+# are separated by commas and/or whitespace.
+#
+# Each key must appear immediately before the corresponding certificate,
+# optionally followed by additional issuer certificates that complete the
+# certificate chain for that key. When multiple files are specified, they
+# are equivalent to a single file that is concatenated from those files
+# in the given order. Thus, while a key must always precede its certificate
+# and issuer chain, it can be in a separate file, so long as that file is
+# listed immediately before the file that holds the corresponding
+# certificate chain. Once all the files are concatenated, the sequence of
+# PEM objects must be: key1, cert1, [chain1], key2, cert2, [chain2], ...,
+# keyN, certN, [chainN].
+#
+smtp_tls_chain_files = ${smtp_tls_chain_files}
 
 EOF
 
