@@ -15,7 +15,7 @@ umask 0022
 # ---------------
 #
 
-if test ! -f "/etc/device/services/mail/smtp/disabled.bin" -a -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
+if test ! -f "/etc/device/services/mail/smtp/disabled.bin" -a -f "/etc/device/services/mail/tls/tls-dns.txt"; then
 
   if command -v /usr/bin/firewall-cmd 2>/dev/null; then
     logger -t postfix-autodiscovery "Notice: opening firewall for smtp..."
