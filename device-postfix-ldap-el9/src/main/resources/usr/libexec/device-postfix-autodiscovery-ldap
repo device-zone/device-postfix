@@ -163,21 +163,21 @@ EOF
   install -m 0640 -g mail "${ldapremote_cf}" "/etc/postfix/ldapremote.cf"
 
 
-  # handle mailman lists
-  ldapmailman_cf="ldapmailman.cf"
+  # handle mailing lists
+  ldaplist_cf="ldaplist.cf"
 
-  ldap_header "${ldapmailman_cf}" "${uris}"
+  ldap_header "${ldaplist_cf}" "${uris}"
 
-  cat >> ${ldapmailman_cf} <<- EOF
+  cat >> ${ldaplist_cf} <<- EOF
 # Note: base set from $line/ldap-suffix.d/suffix.txt
 search_base = ${ldap_suffix}
-query_filter = (&(|(mail=%s)(mailAlternateAddress=%s))(mailHost=${myhostname})(mailProgramDeliveryInfo=mailman))
+query_filter = (&(|(mail=%s)(mailAlternateAddress=%s))(mailHost=${myhostname})(mailProgramDeliveryInfo=list))
 result_attribute = mail
-result_filter = mailman:
+result_filter = list:
 
 EOF
 
-  install -m 0640 -g mail "${ldapmailman_cf}" "/etc/postfix/ldapmailman.cf"
+  install -m 0640 -g mail "${ldaplist_cf}" "/etc/postfix/ldaplist.cf"
 
 
   # handle relay clientcerts
@@ -219,7 +219,7 @@ virtual_alias_maps = ldap:/etc/postfix/ldapforward.cf, ldap:/etc/postfix/ldapali
 # TRANSPORT MAP
 #
 # See the discussion in the ADDRESS_REWRITING_README document.
-transport_maps = ldap:/etc/postfix/ldapremote.cf ldap:/etc/postfix/ldapmailman.cf ldap:/etc/postfix/ldaplocal.cf
+transport_maps = ldap:/etc/postfix/ldapremote.cf ldap:/etc/postfix/ldaplist.cf ldap:/etc/postfix/ldaplocal.cf
 
 
 # TLS RELAY CLIENT CERTS
