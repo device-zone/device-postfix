@@ -8,7 +8,7 @@
 
   <artifactId>device-postfix</artifactId>
   <groupId>zone.device.platform</groupId>
-  <version>0.9.10</version>
+  <version>0.9.11-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>device postfix package</name>
   <description>Packaging for the postfix appliance</description>
@@ -20,9 +20,9 @@
   </organization>
 
   <scm>
-    <connection>scm:svn:https://github.com/device-zone/device-postfix/tags/device-postfix-0.9.10</connection>
-    <developerConnection>scm:svn:https://github.com/device-zone/device-postfix/tags/device-postfix-0.9.10</developerConnection>
-    <url>https://github.com/device-zone/device-postfix/tags/device-postfix-0.9.10</url>
+    <connection>scm:svn:https://github.com/device-zone/device-postfix/trunk</connection>
+    <developerConnection>scm:svn:https://github.com/device-zone/device-postfix/trunk</developerConnection>
+    <url>https://github.com/device-zone/device-postfix/trunk</url>
   </scm>
 
   <modules>
