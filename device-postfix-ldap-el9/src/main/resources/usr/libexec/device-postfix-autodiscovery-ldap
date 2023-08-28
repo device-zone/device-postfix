@@ -227,6 +227,11 @@ transport_maps = ldap:/etc/postfix/ldapremote.cf ldap:/etc/postfix/ldaplist.cf l
 # Fingerprints of keys allowed to relay
 relay_clientcerts = ldap:/etc/postfix/ldaprelay_clientcerts.cf
 
+
+# DOVECOT
+#
+# pipe flag `D' requires dovecot_destination_recipient_limit = 1
+dovecot_destination_recipient_limit = 1
 EOF
 
 
