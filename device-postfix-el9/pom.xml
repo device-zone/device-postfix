@@ -247,6 +247,9 @@
                 <source>
                   <location>target/classes/usr/libexec/device/services/mail/smtp/set</location>
                 </source>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/show</location>
+                </source>
               </sources>
             </mapping>
             <mapping>
@@ -279,6 +282,9 @@
                 <source>
                   <location>target/classes/usr/libexec/device/services/mail/smtp/relay/realtime-block-list/remove</location>
                 </source>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/realtime-block-list/show</location>
+                </source>
               </sources>
             </mapping>
             <mapping>
@@ -310,6 +316,9 @@
                 </source>
                 <source>
                   <location>target/classes/usr/libexec/device/services/mail/smtp/relay/domain-block-list/remove</location>
+                </source>
+                <source>
+                  <location>target/classes/usr/libexec/device/services/mail/smtp/relay/domain-block-list/show</location>
                 </source>
               </sources>
             </mapping>
