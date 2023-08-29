@@ -26,9 +26,10 @@ if [ -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
   redwax-tool --pem-in="/etc/pki/tls/private/*" \
               --pem-in="/etc/pki/tls/certs/ca-bundle.trust.crt" \
               --pem-in="/etc/pki/tls/certs/*.pem" \
-              --filter=search \
+              --filter=verify \
               --filter-hostname="${tls_dns}" \
               --filter-current \
+              --filter-expiry=ignore-leaf \
               --parameter-out --order-out=key-first \
               --cert-out --chain-out --key-out \
               --pem-out="/run/postfix/private/smtpd.crt" \
@@ -162,9 +163,10 @@ if [ -f "/etc/device/services/mail/tls/tls-client-dns.txt" ]; then
   redwax-tool --pem-in="/etc/pki/tls/private/*" \
               --pem-in="/etc/pki/tls/certs/ca-bundle.trust.crt" \
               --pem-in="/etc/pki/tls/certs/*.pem" \
-              --filter=search \
+              --filter=verify \
               --filter-hostname="${tls_client_dns}" \
               --filter-current \
+              --filter-expiry=ignore-leaf \
               --parameter-out --order-out=key-first \
               --cert-out --chain-out --key-out \
               --pem-out="/run/postfix/private/smtp.crt" \
