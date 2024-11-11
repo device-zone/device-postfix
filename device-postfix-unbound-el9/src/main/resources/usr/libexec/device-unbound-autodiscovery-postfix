@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#
+# Unbound Autodiscovery - Postfix
+# ===============================
+# 
+# This script restarts the postfix server on change of DNSSEC.
+
+set -e
+umask 0022
+
+
+#
+# Restart
+# -------
+#
+
+/usr/bin/systemctl --no-block try-reload-or-restart postfix-autodiscovery.service
+/usr/bin/systemctl --no-block try-reload-or-restart postfix.service
+
+

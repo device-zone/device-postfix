@@ -196,6 +196,22 @@ EOF
   install -m 0640 -g mail "${ldaprelay_clientcerts_cf}" "/etc/postfix/ldaprelay_clientcerts.cf"
 
 
+  # handle tls policy maps
+  ldaptls_policy_maps_cf="ldaptls_policy_maps.cf"
+
+  ldap_header "${ldaptls_policy_maps_cf}" "${uris}"
+
+  cat >> ${ldaptls_policy_maps_cf} <<- EOF
+# Note: base set from $line/ldap-suffix.d/suffix.txt
+search_base = ${ldap_suffix}
+query_filter = (&(objectClass=nisObject)(nisMapName=postfixTLSPolicy)(cn=%s))
+result_attribute = nisMapEntry
+
+EOF
+
+  install -m 0640 -g mail "${ldaptls_policy_maps_cf}" "/etc/postfix/ldaptls_policy_maps.cf"
+
+
   # main ldap config
   cat >> "main.cf" <<- EOF
 
@@ -226,6 +242,12 @@ transport_maps = ldap:/etc/postfix/ldapremote.cf ldap:/etc/postfix/ldaplist.cf l
 #
 # Fingerprints of keys allowed to relay
 relay_clientcerts = ldap:/etc/postfix/ldaprelay_clientcerts.cf
+
+
+# TLS POLICY MAPS
+#
+# Override the TLS policy on a per site basis.
+smtp_tls_policy_maps = ldap:/etc/postfix/ldaptls_policy_maps.cf
 
 
 # DOVECOT

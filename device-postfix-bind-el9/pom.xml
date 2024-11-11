@@ -16,13 +16,13 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
-  <artifactId>device-postfix-tls</artifactId>
+  <artifactId>device-postfix-bind</artifactId>
   <groupId>zone.device.platform.el9</groupId>
   <version>0.9.14-SNAPSHOT</version>
   <packaging>rpm</packaging>
-  <name>device postfix TLS applicance for el9</name>
-  <description>Packaging for the postfix TLS appliance for ${release.distribution}</description>
-  <inceptionYear>2023</inceptionYear>
+  <name>device postfix bind applicance extension for el9</name>
+  <description>Packaging for the postfix bind appliance extension for ${release.distribution}</description>
+  <inceptionYear>2024</inceptionYear>
 
   <build>
     <resources>
@@ -91,28 +91,6 @@
           </defineStatements>
           <mappings>
             <mapping>
-              <directory>/usr/libexec/device/services/mail/smtp/tls</directory>
-              <directoryIncluded>true</directoryIncluded>
-              <filemode>755</filemode>
-              <username>root</username>
-              <groupname>root</groupname>
-            </mapping>
-            <mapping>
-              <directory>/usr/libexec/device/services/mail/smtp/tls</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>755</filemode>
-              <username>root</username>
-              <groupname>root</groupname>
-              <sources>
-                <source>
-                  <location>target/classes/usr/libexec/device/services/mail/smtp/tls/set</location>
-                </source>
-                <source>
-                  <location>target/classes/usr/libexec/device/services/mail/smtp/tls/show</location>
-                </source>
-              </sources>
-            </mapping>
-            <mapping>
               <directory>/usr/libexec/device-autodiscovery/postfix.d</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
@@ -120,43 +98,21 @@
               <groupname>root</groupname>
               <sources>
                 <source>
-                  <location>target/classes/usr/libexec/device-postfix-autodiscovery-tls</location>
-                  <destination>20-tls</destination>
+                  <location>target/classes/usr/libexec/device-postfix-autodiscovery-bind</location>
+                  <destination>15-bind</destination>
                 </source>
               </sources>
             </mapping>
             <mapping>
-              <directory>/usr/libexec/device-postdiscovery/postfix.d</directory>
+              <directory>/usr/libexec/device-autodiscovery/bind.d</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
               <groupname>root</groupname>
               <sources>
                 <source>
-                  <location>target/classes/usr/libexec/device-postfix-postdiscovery-tls</location>
-                  <destination>20-tls</destination>
-                </source>
-              </sources>
-            </mapping>
-            <mapping>
-              <directory>/usr/share/device/services/mail/smtp/tls/incoming-security-level</directory>
-              <directoryIncluded>true</directoryIncluded>
-              <filemode>755</filemode>
-              <username>root</username>
-              <groupname>root</groupname>
-            </mapping>
-            <mapping>
-              <directory>/usr/share/device/services/mail/smtp/tls/incoming-security-level</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>755</filemode>
-              <username>root</username>
-              <groupname>root</groupname>
-              <sources>
-                <source>
-                  <location>target/classes/usr/share/device/services/mail/smtp/tls/incoming-security-level/none</location>
-                </source>
-                <source>
-                  <location>target/classes/usr/share/device/services/mail/smtp/tls/incoming-security-level/encrypt</location>
+                  <location>target/classes/usr/libexec/device-bind-autodiscovery-postfix</location>
+                  <destination>60-postfix</destination>
                 </source>
               </sources>
             </mapping>
@@ -175,10 +131,10 @@
               <groupname>root</groupname>
               <sources>
                 <source>
-                  <location>target/classes/usr/share/device/services/mail/smtp/tls/outgoing-security-level/none</location>
+                  <location>target/classes/usr/share/device/services/mail/smtp/tls/outgoing-security-level/dane</location>
                 </source>
                 <source>
-                  <location>target/classes/usr/share/device/services/mail/smtp/tls/outgoing-security-level/encrypt</location>
+                  <location>target/classes/usr/share/device/services/mail/smtp/tls/outgoing-security-level/dane-only</location>
                 </source>
               </sources>
             </mapping>
@@ -193,8 +149,7 @@
           </preremoveScriptlet>
           <requires>
             <require>device-postfix</require>
-            <require>device-mail-tls</require>
-            <require>redwax-tool &gt;= 0.9.3</require>
+            <require>device-bind-resolver</require>
           </requires>
         </configuration>
       </plugin>

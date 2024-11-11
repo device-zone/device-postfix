@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+umask 0002
+
+OPTIONS="--show - --default may --symlink-base /usr/share/device/services/mail/smtp/tls/incoming-security-level/ --symlink incoming-security-level --default may --symlink-base /usr/share/device/services/mail/smtp/tls/outgoing-security-level/ --symlink outgoing-security-level"
+
+if [ "$1" == "--" ]; then
+
+  /usr/libexec/device-set ${OPTIONS} "$@"
+
+elif [ "$1" == "-c" ]; then
+
+  /usr/libexec/device-set ${OPTIONS} "$@"
+
+fi
+
