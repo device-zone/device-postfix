@@ -43,15 +43,19 @@ if [ -f "/etc/device/services/mail/tls/tls-dns.txt" ]; then
     logger -t postfix-autodiscovery "failed to import postfix server certificate/key."
   fi
 
-if test -L "/etc/device/services/mail/tls/tls-client-ca.crt"; then
-  smtpd_tls_CAfile=$(readlink -f "/etc/device/services/mail/tls/tls-client-ca.crt")
-else
-  smtpd_tls_CAfile=
-fi
+  if test -L "/etc/device/services/mail/tls/tls-client-ca.crt"; then
+    smtpd_tls_CAfile=$(readlink -f "/etc/device/services/mail/tls/tls-client-ca.crt")
+  else
+    smtpd_tls_CAfile=
+  fi
 
   smtpd_tls_chain_files="/run/postfix/private/smtpd.crt"
 
-  smtpd_tls_security_level="may"
+  if test -f "/etc/device/services/mail/smtp/tls/incoming-security-level"; then
+    smtpd_tls_security_level=$(head -n 1 "/etc/device/services/mail/smtp/tls/incoming-security-level")
+  else
+    smtpd_tls_security_level="may"
+  fi
 
   cat >> "main.cf" <<- EOF
 # Note: certificate from /etc/device/services/mail/tls/tls-dns.txt
@@ -83,9 +87,27 @@ smtpd_tls_chain_files = ${smtpd_tls_chain_files}
 #
 smtpd_tls_CAfile = ${smtpd_tls_CAfile}
 
-# Announce STARTTLS support to remote SMTP clients, but do not require that
-# clients use TLS encryption (opportunistic TLS inbound).
+# The SMTP TLS security level for the Postfix SMTP server; when a non-empty
+# value is specified, this overrides the obsolete parameters smtpd_use_tls
+# and smtpd_enforce_tls. This parameter is ignored with
+# "smtpd_tls_wrappermode = yes".
+# 
+# Specify one of the following security levels:
+# 
+# none
+#   TLS will not be used.
+# may
+#   Opportunistic TLS: announce STARTTLS support to remote SMTP clients,
+#   but do not require that clients use TLS encryption.
+# encrypt
+#   Mandatory TLS encryption: announce STARTTLS support to remote SMTP
+#   clients, and reject all plaintext commands except HELO, EHLO, XCLIENT,
+#   STARTTLS, NOOP, QUIT, and (Postfix ≥ 3.9) HELP. According to RFC 2487
+#   this MUST NOT be applied in case of a publicly-referenced SMTP server.
+#   Instead, this should be used on dedicated servers, for example
+#   submission (port 587).
 #
+# Modify as follows: device services mail smtp tls set incoming-security-level=${smtp_tls_security_level}
 smtpd_tls_security_level = ${smtpd_tls_security_level}
 
 # When TLS encryption is optional in the Postfix SMTP server, do not
@@ -124,7 +146,12 @@ else
   smtp_tls_CAfile=/etc/pki/tls/certs/ca-bundle.crt
 fi
 
-smtp_tls_security_level="may"
+if test -f "/etc/device/services/mail/smtp/tls/outgoing-security-level"; then
+  smtp_tls_security_level=$(head -n 1 "/etc/device/services/mail/smtp/tls/outgoing-security-level")
+else
+  smtp_tls_security_level="may"
+fi
+
 
 cat >> "main.cf" <<- EOF
 
@@ -148,6 +175,7 @@ smtp_tls_CAfile = ${smtp_tls_CAfile}
 # Use TLS if this is supported by the remote SMTP server, otherwise use
 # plaintext (opportunistic TLS outbound).
 #
+# Modify as follows: device services mail smtp tls set outgoing-security-level=${smtp_tls_security_level}
 smtp_tls_security_level = ${smtp_tls_security_level}
 
 EOF

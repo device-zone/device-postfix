@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e
+umask 0002
+
+OPTIONS="--default may --symlink-base /usr/share/device/services/mail/smtp/tls/incoming-security-level/ --symlink incoming-security-level --default may --symlink-base /usr/share/device/services/mail/smtp/tls/outgoing-security-level/ --symlink outgoing-security-level"
+
+if [ "$1" == "--" ]; then
+
+  /usr/libexec/device-set ${OPTIONS} "$@"
+
+  /usr/bin/sudo /usr/bin/systemctl try-reload-or-restart postfix-autodiscovery.target
+  /usr/bin/sudo /usr/bin/systemctl try-reload-or-restart postfix.service
+  /usr/bin/sudo /usr/bin/systemctl try-reload-or-restart postfix-postdiscovery.target
+
+elif [ "$1" == "-c" ]; then
+
+  /usr/libexec/device-set ${OPTIONS} "$@"
+
+fi
+
