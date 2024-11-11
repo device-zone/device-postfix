@@ -91,6 +91,13 @@
           </defineStatements>
           <mappings>
             <mapping>
+              <directory>/etc/device/services/mail/smtp/tls</directory>
+              <directoryIncluded>true</directoryIncluded>
+              <filemode>2775</filemode>
+              <username>root</username>
+              <groupname>device</groupname>
+            </mapping>
+            <mapping>
               <directory>/usr/libexec/device/services/mail/smtp/tls</directory>
               <directoryIncluded>true</directoryIncluded>
               <filemode>755</filemode>
