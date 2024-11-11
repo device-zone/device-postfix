@@ -4,7 +4,7 @@
   <parent>
     <artifactId>device-postfix</artifactId>
     <groupId>zone.device.platform</groupId>
-    <version>0.9.14</version>
+    <version>0.9.15-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -18,7 +18,7 @@
 
   <artifactId>device-postfix-bind</artifactId>
   <groupId>zone.device.platform.el9</groupId>
-  <version>0.9.14</version>
+  <version>0.9.15-SNAPSHOT</version>
   <packaging>rpm</packaging>
   <name>device postfix bind applicance extension for el9</name>
   <description>Packaging for the postfix bind appliance extension for ${release.distribution}</description>
