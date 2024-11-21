@@ -139,6 +139,18 @@ EOF
 
 fi
 
+#
+# Open up inet_interfaces
+if test -f "/etc/device/services/mail/smtp/tls/protocol.txt"; then
+  protocol="$(head -n 1 /etc/device/services/mail/smtp/tls/protocol.txt)"
+  if test "${protocol}" == "all"; then
+    postconf -c . inet_protocols=all
+  elif test "${protocol}" == "ipv4-only"; then
+    postconf -c . inet_protocols=ipv4
+  elif test "${protocol}" == "ipv6-only"; then
+    postconf -c . inet_protocols=ipv6
+  fi
+fi
 
 if test -L "/etc/device/services/mail/tls/tls-ca.crt"; then
   smtp_tls_CAfile=$(readlink -f "/etc/device/services/mail/tls/tls-ca.crt")

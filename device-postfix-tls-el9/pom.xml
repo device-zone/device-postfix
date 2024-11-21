@@ -189,6 +189,18 @@
                 </source>
               </sources>
             </mapping>
+            <mapping>
+              <directory>/usr/share/device/services/mail/smtp/tls</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>644</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/share/device/services/mail/smtp/tls/protocol.txt</location>
+                </source>
+              </sources>
+            </mapping>
           </mappings>
           <postinstallScriptlet>
             <scriptFile>target/classes/postinstall</scriptFile>

@@ -3,7 +3,9 @@
 set -e
 umask 0002
 
-OPTIONS="--default may --symlink-base /usr/share/device/services/mail/smtp/tls/incoming-security-level/ --symlink incoming-security-level --default may --symlink-base /usr/share/device/services/mail/smtp/tls/outgoing-security-level/ --symlink outgoing-security-level"
+OPTIONS="--default may --symlink-base /usr/share/device/services/mail/smtp/tls/incoming-security-level/ --symlink incoming-security-level \
+	 --default may --symlink-base /usr/share/device/services/mail/smtp/tls/outgoing-security-level/ --symlink outgoing-security-level \
+	 --default all --select-base /usr/share/device/services/mail/smtp/tls/protocol.txt --select protocol"
 
 if [ "$1" == "--" ]; then
 
